@@ -6,7 +6,7 @@ from dash_extensions import DeferScript
 import os
 
 app = Dash(__name__, external_stylesheets=[
-           dbc.themes.BOOTSTRAP],)
+           dbc.themes.BOOTSTRAP], external_scripts=['./assets/js/html2pdf.bundle.min.js'])
 
 app.scripts.config.serve_locally = True
 
@@ -18,7 +18,7 @@ def imageRenderer(imagemOriginal, imagemSegmentada):
                 src=f'./assets/{imagemSegmentada}', className='w-100', style={"border-radius": "50px"}))], className='w-50 d-inline-block m-0', style={"padding": "0 1.5% 0 3%"}),
 
             html.Div([html.H2('Imagem Original', className='text-center border-bottom text-info'), html.Div(html.Img(src=f'./assets/{imagemOriginal}', className='w-100', style={
-                     "border-radius": "50px"}))], className='w-50 d-inline-block m-0 esse', style={"padding": "0 3% 0 1.5%"}),
+                     "border-radius": "50px"}))], className='w-50 d-inline-block m-0', style={"padding": "0 3% 0 1.5%"}),
         ], className='w-100 d-inline-block', style={"margin-top": "3%"}
         )
     ], style={'height': '33.33%'}, className='rowImages')
@@ -42,30 +42,33 @@ app.layout = html.Div(
               html.Button("Load more", id='load-new-content',
                           n_clicks=0, hidden=True),
               html.P(id='placeholder'),
-              html.Script(src='./assets/js/jspdf.js')
               ], className="m-0 p-0",
 
 
 )
 
-# app.clientside_callback(
-#     """
-#     //import { jsPDF } from "jspdf";
-#     function gerarPDF(n_clicks) {
-#         /const doc = new jsPDF()
-#         //doc.fromHTML($('.esse').get(0), 15, 15, {
-#         //'width': 170,
-#         //});
-#        // doc.save("a.pdf")
-
-# //});
-#     console.log('eu')
-# }
-#     """,
-#     Output('placeholder', 'key'),
-#     Input('js', 'n_clicks'),
-#     prevent_initial_call=True
-# )
+app.clientside_callback(
+    """
+    function gerarPDF(n_clicks) {
+        var element = document.getElementById('output')
+        var main_container_width = element.style.width
+        var opt = {
+                margin: 10,
+                filename:'my-dashboard.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 1, dpi: 300,width: main_container_width}},
+                jsPDF: { unit: 'mm', format: 'A4', orientation: 'portrait'},
+                // Set pagebreaks if you like. It didn't work out well for me.
+                // pagebreak: { mode: ['avoid-all'] }
+            }
+            // Execute the save command. 
+            html2pdf().from(element).set(opt).save()
+}
+    """,
+    Output('placeholder', 'key'),
+    Input('js', 'n_clicks'),
+    prevent_initial_call=True
+)
 
 
 @app.callback(
