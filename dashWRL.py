@@ -2,7 +2,6 @@ from dash import Dash, html, dcc
 import dash_bootstrap_components as dbc
 from dash.dependencies import Input, Output, State
 from dash.exceptions import PreventUpdate
-from dash_extensions import DeferScript
 import os
 
 app = Dash(__name__, external_stylesheets=[
@@ -11,7 +10,7 @@ app = Dash(__name__, external_stylesheets=[
 app.scripts.config.serve_locally = True
 
 
-def imageRenderer(imagemOriginal, imagemSegmentada):
+def imageRenderer(imagemOriginal, imagemSegmentada,imagemOriginal_2, imagemSegmentada_2):
     return html.Div([
         html.Div([
             html.Div([html.H2('Imagem Segmentada', className='text-center border-bottom text-info'), html.Div(html.Img(
@@ -20,8 +19,16 @@ def imageRenderer(imagemOriginal, imagemSegmentada):
             html.Div([html.H2('Imagem Original', className='text-center border-bottom text-info'), html.Div(html.Img(src=f'./assets/{imagemOriginal}', className='w-100', style={
                      "border-radius": "50px"}))], className='w-50 d-inline-block m-0', style={"padding": "0 3% 0 1.5%"}),
         ], className='w-100 d-inline-block', style={"margin-top": "3%"}
+        ),
+        html.Div([
+            html.Div([html.H2('Imagem Segmentada', className='text-center border-bottom text-info'), html.Div(html.Img(
+                src=f'./assets/{imagemSegmentada_2}', className='w-100', style={"border-radius": "50px"}))], className='w-50 d-inline-block m-0', style={"padding": "0 1.5% 0 3%"}),
+
+            html.Div([html.H2('Imagem Original', className='text-center border-bottom text-info'), html.Div(html.Img(src=f'./assets/{imagemOriginal_2}', className='w-100', style={
+                     "border-radius": "50px"}))], className='w-50 d-inline-block m-0', style={"padding": "0 3% 0 1.5%"}),
+        ], className='w-100 d-inline-block', style={"margin-top": "3%"}
         )
-    ], style={'height': '33.33%'}, className='rowImages')
+    ], style={'height': '50%', "overflow":"hidden"}, className='rowImages html2pdf__page-break toprint')
 
 
 def btnDownload():
@@ -51,21 +58,22 @@ app.clientside_callback(
     """
     function gerarPDF(n_clicks) {
         var element = document.getElementById('output')
+        //var button = document.getElementById('js')
         var main_container_width = element.style.width
         var opt = {
-                margin: 10,
+                //margin: 10,
                 filename:'my-dashboard.pdf',
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 1, dpi: 300,width: main_container_width}},
+                image: { type: 'jpg', quality: 0.3 },
+                html2canvas: { scale: 0.5},
                 jsPDF: { unit: 'mm', format: 'A4', orientation: 'portrait'},
                 // Set pagebreaks if you like. It didn't work out well for me.
-                // pagebreak: { mode: ['avoid-all'] }
+                pagebreak: { mode: ['avoid-all'] }
             }
             // Execute the save command. 
             html2pdf().from(element).set(opt).save()
 }
     """,
-    Output('placeholder', 'key'),
+    Output('js', 'n_clicks'),
     Input('js', 'n_clicks'),
     prevent_initial_call=True
 )
@@ -77,11 +85,11 @@ app.clientside_callback(
     State('output', 'children'))
 def more_output(n_clicks, old_output):
     name = os.listdir('./assets')
-    for i in range(0, len(name)-1, 2):
+    for i in range(0, len(name)-1, 4):
         if name[i] == 'js':
             pass
         else:
-            old_output.append(imageRenderer(name[i], name[i+1]))
+            old_output.append(imageRenderer(name[i], name[i+1],name[i+2], name[i+3]))
     return old_output
 
 
