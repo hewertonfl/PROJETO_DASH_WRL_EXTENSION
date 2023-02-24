@@ -2,6 +2,7 @@ from dash import Dash, html, dcc
 import dash_bootstrap_components as dbc
 from dash.dependencies import Input, Output, State
 from dash.exceptions import PreventUpdate
+import plotly.express as px
 import os
 
 app = Dash(__name__, external_stylesheets=[
@@ -46,8 +47,11 @@ def btnDownload():
 app.layout = html.Div(
     id='output',
     children=[btnDownload(),
+    dcc.Store(id='local',data=[], storage_type='local'),
               html.Button("Load more", id='load-new-content',
                           n_clicks=0, hidden=True),
+                          html.Button("Store", id='store',
+                          n_clicks=0),
               html.P(id='placeholder'),
               ], className="m-0 p-0",
 
@@ -57,27 +61,22 @@ app.layout = html.Div(
 app.clientside_callback(
     """
     function gerarPDF(n_clicks) {
-        var element = document.getElementById('output')
-        //var button = document.getElementById('js')
-        var main_container_width = element.style.width
-        var opt = {
-                //margin: 10,
-                filename:'my-dashboard.pdf',
-                image: { type: 'jpg', quality: 0.3 },
-                html2canvas: { scale: 0.5},
-                jsPDF: { unit: 'mm', format: 'A4', orientation: 'portrait'},
-                // Set pagebreaks if you like. It didn't work out well for me.
-                pagebreak: { mode: ['avoid-all'] }
-            }
-            // Execute the save command. 
-            html2pdf().from(element).set(opt).save()
+    const button = document.getElementById('js')
+    button.style.display = 'none'
+    window.print()
+    button.style.display = 'block'
 }
     """,
     Output('js', 'n_clicks'),
     Input('js', 'n_clicks'),
     prevent_initial_call=True
 )
-
+@app.callback(
+    Output("local", "data"),
+    Input("store","n_clicks"),
+)
+def storeData(value):
+    return value
 
 @app.callback(
     Output('output', 'children'),
@@ -91,6 +90,8 @@ def more_output(n_clicks, old_output):
         else:
             old_output.append(imageRenderer(name[i], name[i+1],name[i+2], name[i+3]))
     return old_output
+
+
 
 
 if __name__ == '__main__':
