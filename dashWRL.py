@@ -11,7 +11,7 @@ app = Dash(__name__, external_stylesheets=[
 app.scripts.config.serve_locally = True
 
 
-def imageRenderer(imagemOriginal, imagemSegmentada,imagemOriginal_2, imagemSegmentada_2):
+def imageRenderer(imagemOriginal, imagemSegmentada):
     return html.Div([
         html.Div([
             html.Div([html.H2('Imagem Segmentada', className='text-center border-bottom text-info'), html.Div(html.Img(
@@ -21,15 +21,7 @@ def imageRenderer(imagemOriginal, imagemSegmentada,imagemOriginal_2, imagemSegme
                      "border-radius": "50px"}))], className='w-50 d-inline-block m-0', style={"padding": "0 3% 0 1.5%"}),
         ], className='w-100 d-inline-block', style={"margin-top": "3%"}
         ),
-        html.Div([
-            html.Div([html.H2('Imagem Segmentada', className='text-center border-bottom text-info'), html.Div(html.Img(
-                src=f'./assets/{imagemSegmentada_2}', className='w-100', style={"border-radius": "50px"}))], className='w-50 d-inline-block m-0', style={"padding": "0 1.5% 0 3%"}),
-
-            html.Div([html.H2('Imagem Original', className='text-center border-bottom text-info'), html.Div(html.Img(src=f'./assets/{imagemOriginal_2}', className='w-100', style={
-                     "border-radius": "50px"}))], className='w-50 d-inline-block m-0', style={"padding": "0 3% 0 1.5%"}),
-        ], className='w-100 d-inline-block', style={"margin-top": "3%"}
-        )
-    ], style={'height': '50%', "overflow":"hidden"}, className='rowImages html2pdf__page-break toprint')
+    ], style={'height': '50%', "overflow":"hidden"}, className='rowImages')
 
 
 def btnDownload():
@@ -84,11 +76,11 @@ def storeData(value):
     State('output', 'children'))
 def more_output(n_clicks, old_output):
     name = os.listdir('./assets')
-    for i in range(0, len(name)-1, 4):
+    for i in range(0, len(name)-1, 2):
         if name[i] == 'js':
             pass
         else:
-            old_output.append(imageRenderer(name[i], name[i+1],name[i+2], name[i+3]))
+            old_output.append(imageRenderer(name[i], name[i+1]))
     return old_output
 
 
