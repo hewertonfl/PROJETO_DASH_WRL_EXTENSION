@@ -21,7 +21,7 @@ def imageRenderer(imagemOriginal, imagemSegmentada):
                      "border-radius": "50px"}))], className='w-50 d-inline-block m-0', style={"padding": "0 3% 0 1.5%"}),
         ], className='w-100 d-inline-block', style={"margin-top": "3%"}
         ),
-    ], style={'height': '50%', "overflow":"hidden"}, className='rowImages')
+    ], style={'height': '50%', "overflow": "hidden"}, className='rowImages')
 
 
 def btnDownload():
@@ -39,12 +39,8 @@ def btnDownload():
 app.layout = html.Div(
     id='output',
     children=[btnDownload(),
-    dcc.Store(id='local',data=[], storage_type='local'),
               html.Button("Load more", id='load-new-content',
-                          n_clicks=0, hidden=True),
-                          html.Button("Store", id='store',
-                          n_clicks=0),
-              html.P(id='placeholder'),
+                          n_clicks=0, hidden=True)
               ], className="m-0 p-0",
 
 
@@ -63,12 +59,7 @@ app.clientside_callback(
     Input('js', 'n_clicks'),
     prevent_initial_call=True
 )
-@app.callback(
-    Output("local", "data"),
-    Input("store","n_clicks"),
-)
-def storeData(value):
-    return value
+
 
 @app.callback(
     Output('output', 'children'),
@@ -82,8 +73,6 @@ def more_output(n_clicks, old_output):
         else:
             old_output.append(imageRenderer(name[i], name[i+1]))
     return old_output
-
-
 
 
 if __name__ == '__main__':
